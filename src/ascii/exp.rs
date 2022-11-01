@@ -1,17 +1,17 @@
 use nom::{IResult, sequence::tuple, branch::alt, bytes::complete::tag, combinator::map};
 
-use super::exp_inter::{Intermediate, parse_intermediate};
+use super::exp_inter::{Inter, parse_intermediate};
 
 #[derive(Debug)]
 pub enum Expression{
-    Terminal(Intermediate),
+    Terminal(Inter),
     Sequence{
-        content: Intermediate,
+        content: Inter,
         next: Box<Expression>
     },
     Frac{
-        over: Intermediate,
-        under: Intermediate
+        over: Inter,
+        under: Inter
     }
 }
 
@@ -32,8 +32,8 @@ fn parse_ii(i: &str) -> IResult<&str, Expression>{
 
 pub fn parse_expression(i: &str) -> IResult<&str, Expression>{
     alt((
-        parse_e,
+        parse_ii,
         parse_ie,
-        parse_ii
+        parse_e,
     ))(i)
 }

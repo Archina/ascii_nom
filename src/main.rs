@@ -1,58 +1,10 @@
 extern crate strum;
-#[macro_use] extern crate strum_macros;
+extern crate strum_macros;
 
 pub mod ascii;
+pub mod mathml;
 
-use ascii::{sym::Symbol, exp_simple::{parse_simple, Simple}};
-use nom::{bytes::complete::tag, combinator::{self, map}, sequence::{delimited, self, tuple}, branch::alt, Parser, character::{complete::{digit1, alpha1}}, multi::many1};
-
-use crate::ascii::{sym::parse_symbols, exp::parse_expression};
-
-fn parse_int(i: &str) -> nom::IResult<&str, &str>{
-    tag("int")(i)
-}
-
-fn parse_bracket(i: &str) -> nom::IResult<&str, (GroupingBracket, Simple, GroupingBracket)>{
-    // Modifiers are abs, floor, ceil, norm
-    tuple((
-        parse_bracket_start, parse_simple, parse_bracket_end
-    ))(i)
-}
-
-#[derive(Debug)]
-pub enum GroupingBracket{
-    Round,
-    Square,
-    Squirly,
-    Angle,
-    Ghost
-}
-
-#[derive(Debug)]
-struct Grouping{
-    open: GroupingBracket,
-    close: GroupingBracket
-}
-
-fn parse_bracket_start(i: &str) -> nom::IResult<&str, GroupingBracket>{
-    alt((
-        map(tag("("), |_| GroupingBracket::Round),
-        map(tag("["), |_| GroupingBracket::Square),
-        map(tag("{"), |_| GroupingBracket::Squirly),
-        map(alt((tag("(:"), tag("<<"))), |_| GroupingBracket::Angle),
-        map(tag("{:"), |_| GroupingBracket::Ghost)
-    ))(i)
-}
-
-fn parse_bracket_end(i: &str) -> nom::IResult<&str, GroupingBracket>{
-    alt((
-        map(tag(")"), |_| GroupingBracket::Round),
-        map(tag("]"), |_| GroupingBracket::Square),
-        map(tag("}"), |_| GroupingBracket::Squirly),
-        map(alt((tag(":)"), tag(">>"))), |_| GroupingBracket::Angle),
-        map(tag(":}"), |_| GroupingBracket::Ghost)
-    ))(i)
-}
+use crate::{ascii::{exp::parse_expression, sym::{Symbol, parse_symbol}, sym_greek::{Greek, parse_greek}}, mathml::MathMl};
 
 fn main() {
     println!("{:?}", parse_expression("(123)"));
@@ -65,4 +17,13 @@ fn main() {
     println!("{:?}", parse_expression("[int:}"));
     println!("{:?}", parse_expression("theta12huh13Theta"));
     println!("{:?}", parse_expression("thetaThetavarthetaetagamma"));
+    println!("{:?}", parse_expression("alphagammaGamma/d"));
+
+    if let Ok((_, exp)) = parse_expression("alphagammaGamma/d"){
+        println!("{}", exp.to_math_ml());
+    }
+
+    if let Ok((_, exp)) = parse_symbol("alpha"){
+        println!("{}", exp.to_math_ml());
+    }
 }
