@@ -11,10 +11,10 @@ pub enum BinaryOperator{
 
 pub fn parse_b_operator(i: &str) -> nom::IResult<&str, BinaryOperator>{
     alt((
+        map(tag("underset"), |_| BinaryOperator::Underset),
+        map(tag("overset"), |_| BinaryOperator::Overset),
+        map(tag("color"), |_| BinaryOperator::Color),
         map(tag("frac"), |_| BinaryOperator::Frac),
         map(tag("root"), |_| BinaryOperator::Root),
-        map(tag("color"), |_| BinaryOperator::Color),
-        map(tag("overset"), |_| BinaryOperator::Overset),
-        map(tag("underset"), |_| BinaryOperator::Underset),
     ))(i)
 }

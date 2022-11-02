@@ -22,19 +22,23 @@ pub enum Simple{
     }
 }
 
-#[allow(non_camel_case_types)]
+#[allow(non_snake_case)]
 pub fn parse_bSS(i: &str) -> nom::IResult<&str, Simple> {
     map(tuple((parse_b_operator, parse_simple, parse_simple)), |(ops, first, second)| Simple::Binary { ops, first: Box::new(first), second: Box::new(second) })(i)
 }
 
 pub fn parse_v(i: &str) -> nom::IResult<&str, Simple>{
+    // This should only parse a single symbol... whoops
     map(parse_symbols, |out| Simple::Syms(out))(i)
 }
 
+#[allow(non_snake_case)]
 pub fn parse_uS(i: &str) -> nom::IResult<&str, Simple>{
+    // Second argument can only contains a single symbol or a lEr, if simple == lEr then discard brackets
     map(tuple((parse_unary, parse_simple)), |(ops, content)| Simple::Unary { ops, content: Box::new(content) })(i)
 }
 
+#[allow(non_snake_case)]
 pub fn parse_Es(i: &str) -> IResult<&str, Vec<Expression>>{
     map(tuple((
         parse_expression,
@@ -50,6 +54,7 @@ pub fn parse_Es(i: &str) -> IResult<&str, Vec<Expression>>{
     })(i)
 }
 
+#[allow(non_snake_case)]
 pub fn parse_lEr(i: &str) -> IResult<&str, Simple>{
     map(tuple((parse_bracket_start, parse_Es, parse_bracket_end)), |(left, content, right)| Simple::Grouping { content, left, right })(i)
 }

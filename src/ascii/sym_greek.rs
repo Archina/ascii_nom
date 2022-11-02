@@ -46,55 +46,97 @@ pub enum Greek{
     Omega
 }
 
-pub fn parse_greek(i: &str) -> IResult<&str, Symbol>{
+pub fn parse_greek_10(i: &str) -> IResult<&str, Symbol>{
+    map(tag("varepsilon"), greek_2_sym)(i)
+}
+
+pub fn parse_greek_8(i: &str) -> IResult<&str, Symbol>{
+    map(tag("vartheta"), greek_2_sym)(i)
+}
+
+pub fn parse_greek_7(i: &str) -> IResult<&str, Symbol>{
     map(alt((
-        alt((
-            tag("alpha"),
-            tag("beta"),
-            tag("gamma"),
-            tag("Gamma"),
-            tag("delta"),
-            tag("Delta"),
-            tag("epsilon"),
-            tag("varepsilon"),
-            tag("zeta"),
-            tag("eta"),
-            tag("theta"),
-            tag("Theta"),
-            tag("vartheta"),
-        )),
-        alt((
-            tag("iota"),
-            tag("kappa"),
-            tag("lambda"),
-            tag("Lambda"),
-            tag("mu"),
-            tag("nu"),
-            tag("xi"),
-            tag("Xi"),
-            tag("pi"),
-            tag("Pi"),
-            tag("rho"),
-            tag("sigma"),
-            tag("Sigma"),
-            tag("tau"),
-            tag("upsilon"),
-            tag("phi"),
-            tag("Phi"),
-            tag("varphi"),
-        )),
+        tag("epsilon"),
+        tag("upsilon"),
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek_6(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
+        tag("lambda"),
+        tag("Lambda"),
+        tag("varphi"),
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek_5(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
+        tag("alpha"),
+        tag("gamma"),
+        tag("Gamma"),
+        tag("delta"),
+        tag("Delta"),
+        tag("theta"),
+        tag("Theta"),
+        tag("kappa"),
+        tag("sigma"),
+        tag("Sigma"),
+        tag("omega"),
+        tag("Omega"),
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek_4(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
+        tag("beta"),
+        tag("zeta"),
+        tag("iota"),
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek_3(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
+        tag("eta"),
+        tag("rho"),
+        tag("tau"),
+        tag("phi"),
+        tag("Phi"),
         tag("chi"),
         tag("psi"),
         tag("Psi"),
-        tag("omega"),
-        tag("Omega"),
-    )), |val: &str| {
-        let first_char: char = val.chars().nth(0).unwrap();
-        Symbol{
-            payload: super::sym::SymbolType::Greek(Greek::from_str(val).unwrap()),
-            semantic: if first_char.is_uppercase() {SymbolSemantic::Operator} else { SymbolSemantic::Identifier}
-        }
-    })(i)
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek_2(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
+        tag("mu"),
+        tag("nu"),
+        tag("xi"),
+        tag("Xi"),
+        tag("pi"),
+        tag("Pi"),
+    )), greek_2_sym)(i)
+}
+
+pub fn parse_greek(i: &str) -> IResult<&str, Symbol>{
+    alt((
+        parse_greek_10,
+        parse_greek_8,
+        parse_greek_7,
+        parse_greek_6,
+        parse_greek_5,
+        parse_greek_4,
+        parse_greek_3,
+        parse_greek_2,
+    ))(i)
+}
+
+fn greek_2_sym(val: &str) -> Symbol{
+    let first_char: char = val.chars().nth(0).unwrap();
+    Symbol{
+        payload: super::sym::SymbolType::Greek(Greek::from_str(val).unwrap()),
+        semantic: if first_char.is_uppercase() {SymbolSemantic::Operator} else { SymbolSemantic::Identifier}
+    }
 }
 
 impl Greek{
