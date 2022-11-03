@@ -19,7 +19,7 @@ fn main() {
     println!("{:?}", parse_expression("thetaThetavarthetaetagamma"));
     println!("{:?}", parse_expression("alphagammaGamma/d"));
 
-    if let Ok((_, exp)) = parse_expression("alphagammaGamma/d"){
+    if let Ok((_, exp)) = parse_expression("(alpha)gammaGamma/d"){
         println!("{}", exp.to_math_ml());
     }
 

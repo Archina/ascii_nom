@@ -10,3 +10,4 @@ pub mod sym_binary;
 pub mod sym_op;
 pub mod sym_logic;
 pub mod sym_misc;
+pub mod sym_arrow;

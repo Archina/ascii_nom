@@ -1,7 +1,7 @@
 use nom::{branch::alt, sequence::{tuple, preceded}, combinator::map, bytes::complete::tag, IResult, multi::many0};
 
-use super::{bracket::{GroupingBracket, parse_bracket_start, parse_bracket_end}, sym_unary::{parse_unary, UnaryOperator}, sym_binary::{BinaryOperator, parse_b_operator}};
-use super::{sym::{parse_symbols, Symbol}, exp::{parse_expression, Expression}};
+use super::{bracket::{GroupingBracket, parse_bracket_start, parse_bracket_end}, sym_unary::{parse_unary, UnaryOperator}, sym_binary::{BinaryOperator, parse_b_operator}, sym::parse_symbol};
+use super::{sym::Symbol, exp::{parse_expression, Expression}};
 
 #[derive(Debug)]
 pub enum Simple{
@@ -14,7 +14,7 @@ pub enum Simple{
         ops: UnaryOperator,
         content: Box<Simple>,
     },
-    Syms(Vec<Symbol>),
+    Syms(Symbol),
     Grouping{
         content: Vec<Expression>,
         left: GroupingBracket,
@@ -28,8 +28,7 @@ pub fn parse_bSS(i: &str) -> nom::IResult<&str, Simple> {
 }
 
 pub fn parse_v(i: &str) -> nom::IResult<&str, Simple>{
-    // This should only parse a single symbol... whoops
-    map(parse_symbols, |out| Simple::Syms(out))(i)
+    map(parse_symbol, |out| Simple::Syms(out))(i)
 }
 
 #[allow(non_snake_case)]
@@ -54,6 +53,7 @@ pub fn parse_Es(i: &str) -> IResult<&str, Vec<Expression>>{
     })(i)
 }
 
+// Introduces mrow - might also pre and append bracket - not always
 #[allow(non_snake_case)]
 pub fn parse_lEr(i: &str) -> IResult<&str, Simple>{
     map(tuple((parse_bracket_start, parse_Es, parse_bracket_end)), |(left, content, right)| Simple::Grouping { content, left, right })(i)
