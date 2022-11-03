@@ -18,24 +18,24 @@ pub enum Logic{
     Models
 }
 
-pub fn parse_logic_7(i: &str) -> IResult<&str, Logic>{
-    map(tag("implies"), |_| Logic::Implies)(i)
+pub fn parse_logic_7(i: &str) -> IResult<&str, Symbol>{
+    map(tag("implies"), |_| logic_2_sym(Logic::Implies))(i)
 }
 
-pub fn parse_logic_6(i: &str) -> IResult<&str, Logic>{
-    alt((
+pub fn parse_logic_6(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
         map(tag("forall"), |_| Logic::Forall),
         map(tag("exists"), |_| Logic::Exists),
         map(tag("models"), |_| Logic::Models),
-    ))(i)
+    )), logic_2_sym)(i)
 }
 
-pub fn parse_logic_5(i: &str) -> IResult<&str, Logic>{
-    map(tag("vdash"), |_| Logic::Vdash)(i)
+pub fn parse_logic_5(i: &str) -> IResult<&str, Symbol>{
+    map(tag("vdash"), |_| logic_2_sym(Logic::Vdash))(i)
 }
 
-pub fn parse_logic_3(i: &str) -> IResult<&str, Logic>{
-    alt((
+pub fn parse_logic_3(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
         map(tag("and"), |_| Logic::And),
         map(tag("not"), |_| Logic::Not),
         map(tag("neg"), |_| Logic::Not),
@@ -46,35 +46,25 @@ pub fn parse_logic_3(i: &str) -> IResult<&str, Logic>{
         map(tag("top"), |_| Logic::Top),
         map(tag("|--"), |_| Logic::Vdash),
         map(tag("|=="), |_| Logic::Models),
-    ))(i)
+    )), logic_2_sym)(i)
 }
 
-pub fn parse_logic_2(i: &str) -> IResult<&str, Logic>{
-    alt((
+pub fn parse_logic_2(i: &str) -> IResult<&str, Symbol>{
+    map(alt((
         map(tag("or"), |_| Logic::Or),
         map(tag("=>"), |_| Logic::Implies),
         map(tag("if"), |_| Logic::If),
         map(tag("AA"), |_| Logic::Forall),
         map(tag("EE"), |_| Logic::Exists),
         map(tag("TT"), |_| Logic::Top),
-    ))(i)
+    )), logic_2_sym)(i)
 }
 
-pub fn l_2_s(logic: Logic) -> Symbol{
+fn logic_2_sym(logic: Logic) -> Symbol{
     Symbol{
         payload: SymbolType::Logic(logic),
         semantic: SymbolSemantic::Operator
     }
-}
-
-pub fn parse_logic(i: &str) -> IResult<&str, Logic>{
-    alt((
-        parse_logic_7,
-        parse_logic_6,
-        parse_logic_5,
-        parse_logic_3,
-        parse_logic_2,
-    ))(i)
 }
 
 impl Logic{

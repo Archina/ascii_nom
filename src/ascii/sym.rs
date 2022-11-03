@@ -1,6 +1,6 @@
 use nom::{multi::many1, branch::alt, combinator::map, character::complete::{digit1, one_of}, IResult};
 
-use super::{sym_logic::{parse_logic_6, Logic, l_2_s, parse_logic_5, parse_logic_3, parse_logic_2, parse_logic_7}, sym_rel::{parse_relation_6, Relation, parse_relation_2, parse_relation_1, parse_relation_3, parse_relation_4, parse_relation_5, parse_relation_8}, sym_op::{parse_op_6, Operator, parse_op_1, parse_op_3, parse_op_2, parse_op_8, parse_op_9, parse_op_5, parse_op_4}, sym_greek::{parse_greek_3, parse_greek_2, parse_greek_5, parse_greek_4, parse_greek_6, parse_greek_7, parse_greek_8, parse_greek_10}, sym_misc::{MiscOperator, parse_misc_2, parse_misc_3, parse_misc_4, parse_misc_5, parse_misc_6, parse_misc_7, parse_misc_8, parse_misc_9}, sym_arrow::{Arrow, parse_arrow_10, parse_arrow_9, parse_arrow_7, parse_arrow_6, parse_arrow_4, parse_arrow_3, parse_arrow_2, parse_arrow_21, parse_arrow_17, parse_arrow_14}};
+use super::{sym_logic::{parse_logic_6, Logic, parse_logic_5, parse_logic_3, parse_logic_2, parse_logic_7}, sym_rel::{parse_relation_6, Relation, parse_relation_2, parse_relation_1, parse_relation_3, parse_relation_4, parse_relation_5, parse_relation_8}, sym_op::{parse_op_6, Operator, parse_op_1, parse_op_3, parse_op_2, parse_op_8, parse_op_9, parse_op_5, parse_op_4}, sym_greek::{parse_greek_3, parse_greek_2, parse_greek_5, parse_greek_4, parse_greek_6, parse_greek_7, parse_greek_8, parse_greek_10}, sym_misc::{MiscOperator, parse_misc_2, parse_misc_3, parse_misc_4, parse_misc_5, parse_misc_6, parse_misc_7, parse_misc_8, parse_misc_9}, sym_arrow::{Arrow, parse_arrow_10, parse_arrow_9, parse_arrow_7, parse_arrow_6, parse_arrow_4, parse_arrow_3, parse_arrow_2, parse_arrow_21, parse_arrow_17, parse_arrow_14}};
 
 #[derive(Debug)]
 pub struct Symbol{
@@ -70,7 +70,7 @@ pub fn parse_symbol_8(i: &str) -> IResult<&str, Symbol>{
 
 pub fn parse_symbol_7(i: &str) -> IResult<&str, Symbol>{
     alt((
-        map(parse_logic_7, l_2_s),
+        parse_logic_7,
         parse_greek_7,
         parse_misc_7,
         parse_arrow_7
@@ -79,7 +79,7 @@ pub fn parse_symbol_7(i: &str) -> IResult<&str, Symbol>{
 
 pub fn parse_symbol_6(i: &str) -> IResult<&str, Symbol>{
     alt((
-        map(parse_logic_6, l_2_s),
+        parse_logic_6,
         parse_greek_6,
         parse_op_6,
         parse_relation_6,
@@ -90,7 +90,7 @@ pub fn parse_symbol_6(i: &str) -> IResult<&str, Symbol>{
 
 pub fn parse_symbol_5(i: &str) -> IResult<&str, Symbol>{
     alt((
-        map(parse_logic_5, l_2_s),
+        parse_logic_5,
         parse_greek_5,
         parse_op_5,
         parse_relation_5,
@@ -110,7 +110,7 @@ pub fn parse_symbol_4(i: &str) -> IResult<&str, Symbol>{
 
 pub fn parse_symbol_3(i: &str) -> IResult<&str, Symbol>{
     alt((
-        map(parse_logic_3, l_2_s),
+        parse_logic_3,
         parse_greek_3,
         parse_op_3,
         parse_relation_3,
@@ -121,7 +121,7 @@ pub fn parse_symbol_3(i: &str) -> IResult<&str, Symbol>{
 
 pub fn parse_symbol_2(i: &str) -> IResult<&str, Symbol>{
     alt((
-        map(parse_logic_2, l_2_s),
+        parse_logic_2,
         parse_greek_2,
         parse_op_2,
         parse_relation_2,
