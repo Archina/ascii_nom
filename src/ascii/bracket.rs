@@ -1,7 +1,7 @@
 use nom::{branch::alt, combinator::map, bytes::complete::tag};
 
-#[derive(Debug)]
-pub enum GroupingBracket{
+#[derive(Debug, Clone, Copy)]
+pub enum BracketType{
     Round,
     Square,
     Squirly,
@@ -11,32 +11,44 @@ pub enum GroupingBracket{
     RFloor,
     LCeil,
     RCeil,
+    Norm,
+    Abs,
 }
 
-pub fn parse_bracket_start(i: &str) -> nom::IResult<&str, GroupingBracket>{
+#[derive(PartialEq)]
+pub enum BracketState{
+    Open, Close
+}
+
+pub struct Bracket{
+    pub bracket: BracketType,
+    pub state: BracketState
+}
+
+pub fn parse_bracket_start(i: &str) -> nom::IResult<&str, BracketType>{
     alt((
-        map(tag("("), |_| GroupingBracket::Round),
-        map(tag("["), |_| GroupingBracket::Square),
-        map(tag("{"), |_| GroupingBracket::Squirly),
-        map(alt((tag("(:"), tag("<<"))), |_| GroupingBracket::Angle),
-        map(tag("{:"), |_| GroupingBracket::Ghost),// Brackets
-        map(tag("|__"), |_| GroupingBracket::LFloor),
-        map(tag("lfloor"), |_| GroupingBracket::LFloor),
-        map(tag("|~"), |_| GroupingBracket::LCeil),
-        map(tag("lceiling"), |_| GroupingBracket::LCeil),
+        map(tag("lceiling"), |_| BracketType::LCeil),
+        map(tag("lfloor"), |_| BracketType::LFloor),
+        map(tag("|__"), |_| BracketType::LFloor),
+        map(tag("|~"), |_| BracketType::LCeil),
+        map(alt((tag("(:"), tag("<<"))), |_| BracketType::Angle),
+        map(tag("{:"), |_| BracketType::Ghost),// Brackets
+        map(tag("("), |_| BracketType::Round),
+        map(tag("["), |_| BracketType::Square),
+        map(tag("{"), |_| BracketType::Squirly),
     ))(i)
 }
 
-pub fn parse_bracket_end(i: &str) -> nom::IResult<&str, GroupingBracket>{
+pub fn parse_bracket_end(i: &str) -> nom::IResult<&str, BracketType>{
     alt((
-        map(tag(")"), |_| GroupingBracket::Round),
-        map(tag("]"), |_| GroupingBracket::Square),
-        map(tag("}"), |_| GroupingBracket::Squirly),
-        map(alt((tag(":)"), tag(">>"))), |_| GroupingBracket::Angle),
-        map(tag(":}"), |_| GroupingBracket::Ghost),
-        map(tag("__|"), |_| GroupingBracket::RFloor),
-        map(tag("rfloor"), |_| GroupingBracket::RFloor),
-        map(tag("~|"), |_| GroupingBracket::RCeil),
-        map(tag("rceiling"), |_| GroupingBracket::RCeil),
+        map(tag("rceiling"), |_| BracketType::RCeil),
+        map(tag("rfloor"), |_| BracketType::RFloor),
+        map(tag("__|"), |_| BracketType::RFloor),
+        map(tag("~|"), |_| BracketType::RCeil),
+        map(alt((tag(":)"), tag(">>"))), |_| BracketType::Angle),
+        map(tag(":}"), |_| BracketType::Ghost),
+        map(tag(")"), |_| BracketType::Round),
+        map(tag("]"), |_| BracketType::Square),
+        map(tag("}"), |_| BracketType::Squirly),
     ))(i)
 }

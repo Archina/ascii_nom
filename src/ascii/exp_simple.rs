@@ -1,6 +1,6 @@
 use nom::{branch::alt, sequence::{tuple, preceded}, combinator::map, bytes::complete::tag, IResult, multi::many0};
 
-use super::{bracket::{GroupingBracket, parse_bracket_start, parse_bracket_end}, sym_unary::{parse_unary, UnaryOperator}, sym_binary::{BinaryOperator, parse_b_operator}, sym::parse_symbol};
+use super::{bracket::{BracketType, parse_bracket_start, parse_bracket_end}, sym_unary::{parse_unary, UnaryOperator, parse_fake_unary}, sym_binary::{BinaryOperator, parse_b_operator}, sym::parse_symbol, exp_inter::Inter};
 use super::{sym::Symbol, exp::{parse_expression, Expression}};
 
 #[derive(Debug)]
@@ -17,9 +17,9 @@ pub enum Simple{
     Syms(Symbol),
     Grouping{
         content: Vec<Expression>,
-        left: GroupingBracket,
-        right: GroupingBracket
-    }
+        left: BracketType,
+        right: BracketType
+    },
 }
 
 #[allow(non_snake_case)]
@@ -34,7 +34,13 @@ pub fn parse_v(i: &str) -> nom::IResult<&str, Simple>{
 #[allow(non_snake_case)]
 pub fn parse_uS(i: &str) -> nom::IResult<&str, Simple>{
     // Second argument can only contains a single symbol or a lEr, if simple == lEr then discard brackets
-    map(tuple((parse_unary, parse_simple)), |(ops, content)| Simple::Unary { ops, content: Box::new(content) })(i)
+    alt((
+        map(tuple((parse_fake_unary, parse_simple)), |(fake, simple)| {
+            let (left, right) = fake;
+            Simple::Grouping { content: vec![Expression::Terminal(Inter::Mediate(simple))], left, right }
+        }),
+        map(tuple((parse_unary, parse_simple)), |(ops, content)| Simple::Unary { ops, content: Box::new(content) })
+    ))(i)
 }
 
 #[allow(non_snake_case)]
