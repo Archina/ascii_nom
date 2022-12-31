@@ -43,6 +43,39 @@ mod tests {
     }
 
     #[test]
+    fn parse_vector(){
+        if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("((a),(s),(d))") {
+            // Everything consumed...
+            assert_eq!(unparsed.len(), 0);
+            assert_eq!("<mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mi>a</mi></mtd></mtr><mtr><mtd><mi>s</mi></mtd></mtr><mtr><mtd><mi>d</mi></mtd></mtr></mtable><mo>)</mo></mrow>", parsed.to_math_ml());
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn parse_transposed_vector(){
+        if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("((2,4,5))") {
+            // Everything consumed...
+            assert_eq!(unparsed.len(), 0);
+            assert_eq!("<mrow><mo>(</mo><mtable columnlines=\"none none none\"><mtr><mtd><mn>2</mn></mtd><mtd><mn>4</mn></mtd><mtd><mn>5</mn></mtd></mtr></mtable><mo>)</mo></mrow>", parsed.to_math_ml());
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn parse_nested_matrix(){
+        if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("((((a),(b)),2),(3,4))") {
+            // Everything consumed...
+            assert_eq!(unparsed.len(), 0);
+            assert_eq!("<mrow><mo>(</mo><mtable columnlines=\"none none\"><mtr><mtd><mrow><mo>(</mo><mtable columnlines=\"none\"><mtr><mtd><mi>a</mi></mtd></mtr><mtr><mtd><mi>b</mi></mtd></mtr></mtable><mo>)</mo></mrow></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable><mo>)</mo></mrow>", parsed.to_math_ml());
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
     fn parse_invalid_matrix_as_nested_brackets() {
         if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("[(3,4,6),(3,3)]") {
             // Everything consumed...

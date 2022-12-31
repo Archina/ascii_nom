@@ -32,19 +32,16 @@ impl MathMl for Simple{
             Self::Unary { ops, content } => format!("{}{}{}{}", ops.open(), content.to_math_ml(), ops.prepend().unwrap_or_default(), ops.close()),
             // We can't know here if we are mo or mi - it is different for different letters... This clearly shows the shortcomings of ascii math because we have less freedom so to say...
             Self::Syms(symbol) => symbol.to_math_ml(),
-            // Dang this can get complicated - we can have a matrix... or we can have something that is just a grouping
-            // Requirement - all inner groupings must use the same limits - opening and closing have to the identical too - the surrounding brackets don't matter
-            // If all content is Expression Terminals of Intermediate Simple... Grouping => attempt matrix => fallback render otherwise
             Self::Grouping { content, left, right } => {
                 format!("<mrow>{}{}{}</mrow>", Bracket{bracket: *left, state: BracketState::Open}.to_math_ml(), content.to_math_ml(), Bracket{bracket: *right, state: BracketState::Close}.to_math_ml())
             },
             Self::Matrix { content, left, right } => {
-                let tags = (0..content.len()).map(|_| "none").collect::<Vec<_>>().join(" ");
+                let tags = (0..content[0].len()).map(|_| "none").collect::<Vec<_>>().join(" ");
                 let mut column_content = String::new();
-                for row_idx in 0..content[0].len(){
+                for clm_idx in 0..content.len() {
                     let mut row_content = String::new();
-                    for clm_idx in 0..content.len() {
-                        row_content = row_content + &format!("<mtd>{}</mtd>", content[row_idx][clm_idx].to_math_ml());
+                    for row_idx in 0..content[0].len(){
+                        row_content = row_content + &format!("<mtd>{}</mtd>", content[clm_idx][row_idx].to_math_ml());
                     }
                     column_content = column_content + &format!("<mtr>{}</mtr>", row_content);
                 }
