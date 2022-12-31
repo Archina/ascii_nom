@@ -1,4 +1,4 @@
-use nom::{branch::alt, sequence::{tuple, preceded}, combinator::map, bytes::complete::tag, IResult, multi::many0};
+use nom::{branch::alt, sequence::{tuple, preceded, delimited, terminated}, combinator::{map, opt, map_res}, bytes::complete::tag, IResult, multi::{many0, many1, separated_list1}, Err, Parser};
 
 use super::{bracket::{BracketType, parse_bracket_start, parse_bracket_end}, sym_unary::{parse_unary, UnaryOperator, parse_fake_unary}, sym_binary::{BinaryOperator, parse_b_operator}, sym::parse_symbol, exp_inter::Inter};
 use super::{sym::Symbol, exp::{parse_expression, Expression}};
@@ -20,6 +20,11 @@ pub enum Simple{
         left: BracketType,
         right: BracketType
     },
+    Matrix{
+        content: Vec<Vec<Expression>>,
+        left: BracketType,
+        right: BracketType
+    }
 }
 
 #[allow(non_snake_case)]
@@ -59,6 +64,34 @@ pub fn parse_Es(i: &str) -> IResult<&str, Vec<Expression>>{
     })(i)
 }
 
+pub fn parse_matrix(input: &str) -> IResult<&str, Simple> {
+    // Parse a single row of the matrix
+    fn parse_row(input: &str) -> IResult<&str, Vec<Expression>> {
+        delimited(parse_bracket_start, separated_list1(tag(","), parse_expression), parse_bracket_end)
+        (input)
+    }
+
+    // Parse the entire matrix
+    let matrix = tuple((
+        parse_bracket_start,
+        many1(terminated(parse_row, opt(tag(",")))),
+        parse_bracket_end,
+    ));
+
+    map_res(matrix, |(left, content, right)| {
+        // Check that all rows have the same number of elements
+        let num_elements = content[0].len();
+        // println!("{num_elements}");
+        for column in content.iter(){
+            if column.len() != num_elements {
+                // println!("{} - {:?}", column.len(), column);
+                return Err("Matrix rows have varying length of elements.");
+            }
+        }
+        Ok(Simple::Matrix { content, left, right })
+    })(input)
+}
+
 // Introduces mrow - might also pre and append bracket - not always
 #[allow(non_snake_case)]
 pub fn parse_lEr(i: &str) -> IResult<&str, Simple>{
@@ -69,6 +102,7 @@ pub fn parse_simple(i: &str) -> nom::IResult<&str, Simple>{
     alt((
         parse_bSS,
         parse_uS,
+        parse_matrix,
         parse_lEr,
         parse_v,
     ))(i)
