@@ -9,6 +9,6 @@ name = "ascii_nom"
 path = "src/lib.rs"
 
 [dependencies]
-nom="*"
-strum="*"
-strum_macros = "*"
+nom="7.1"
+strum="0.24"
+strum_macros = "0.24"
