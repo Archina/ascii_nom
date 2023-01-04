@@ -26,9 +26,9 @@ pub enum Inter{
 
 pub fn parse_intermediate(i: &str) -> IResult<&str, Inter>{
     alt((
-        map(parse_simple, |s| Inter::Mediate(s)),
+        map(tuple((parse_simple, tag("_"), parse_simple, tag("^"), parse_simple)), |(main, _, sub, _, sup)| Inter::SubSup { main, sup, sub }),
         map(tuple((parse_simple, tag("_"), parse_simple)), |(main, _, sub)| Inter::Sub { main, sub }),
         map(tuple((parse_simple, tag("^"), parse_simple)), |(main,_, sup)| Inter::Sup { main, sup }),
-        map(tuple((parse_simple, tag("_"), parse_simple, tag("^"), parse_simple)), |(main, _, sub, _, sup)| Inter::SubSup { main, sup, sub })
+        map(parse_simple, |s| Inter::Mediate(s)),
     ))(i)
 }

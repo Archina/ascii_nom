@@ -16,10 +16,38 @@ impl MathMl for Expression{
 
 impl MathMl for Inter{
     fn to_math_ml(&self) -> String {
+        use crate::ascii::sym::SymbolType::Oper;
         match self{
-            Self::SubSup { main, sub, sup } => format!("<msubsup>{}{}{}</msubsup>", main.to_math_ml(), sub.to_math_ml(), sup.to_math_ml()),
-            Self::Sub { main, sub } => format!("<msub>{}{}</msub>", main.to_math_ml(), sub.to_math_ml()),
-            Self::Sup { main, sup } => format!("<msup>{}{}</msup>", main.to_math_ml(), sup.to_math_ml()),
+            Self::SubSup { main, sub, sup } => {
+                if let Simple::Syms(Symbol { payload: Oper(operator), .. })= main {
+                    match operator{
+                        crate::ascii::sym_op::Operator::Sum | crate::ascii::sym_op::Operator::Product =>
+                            return format!("<munderover>{}{}{}</munderover>", main.to_math_ml(), sub.to_math_ml(), sup.to_math_ml()),
+                        _ => ()
+                    }
+                }
+                format!("<msubsup>{}{}{}</msubsup>", main.to_math_ml(), sub.to_math_ml(), sup.to_math_ml())
+            },
+            Self::Sub { main, sub } => {
+                if let Simple::Syms(Symbol { payload: Oper(operator), .. })= main {
+                    match operator{
+                        crate::ascii::sym_op::Operator::Sum | crate::ascii::sym_op::Operator::Product =>
+                            return format!("<munder>{}{}</munder>", main.to_math_ml(), sub.to_math_ml()),
+                        _ => ()
+                    }
+                }
+                format!("<msub>{}{}</msub>", main.to_math_ml(), sub.to_math_ml())
+            },
+            Self::Sup { main, sup } => {
+                if let Simple::Syms(Symbol { payload: Oper(operator), .. })= main {
+                    match operator{
+                        crate::ascii::sym_op::Operator::Sum | crate::ascii::sym_op::Operator::Product =>
+                            return format!("<mover>{}{}</mover>", main.to_math_ml(), sup.to_math_ml()),
+                        _ => ()
+                    }
+                }
+                format!("<msup>{}{}</msup>", main.to_math_ml(), sup.to_math_ml())
+            },
             Self::Mediate(simple) => simple.to_math_ml(),
         }
     }

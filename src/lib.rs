@@ -85,4 +85,34 @@ mod tests {
             assert!(false);
         }
     }
+
+    #[test]
+    fn parse_matrix_as_layout(){
+        if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("{(2x,+,17y,=,23),(x,-,y,=,5):}") {
+            assert_eq!(unparsed.len(), 0);
+            assert_eq!("<mrow><mo>{</mo><mtable columnlines=\"none none none none none\"><mtr><mtd><mn>2</mn><mi>x</mi></mtd><mtd><mo>+</mo></mtd><mtd><mn>17</mn><mi>y</mi></mtd><mtd><mo>=</mo></mtd><mtd><mn>23</mn></mtd></mtr><mtr><mtd><mi>x</mi></mtd><mtd><mo>-</mo></mtd><mtd><mi>y</mi></mtd><mtd><mo>=</mo></mtd><mtd><mn>5</mn></mtd></mtr></mtable></mrow>", parsed.to_math_ml());
+        } else {
+            assert!(false);
+        }
+    }
+
+    fn parse_sum(){
+
+    }
+
+    fn parse_sum_with_index(){
+
+    }
+
+    #[test]
+    fn parse_sum_with_limit(){
+        if let Ok((unparsed, parsed)) = crate::ascii::exp::parse_expression("sum^k") {
+            // Everything consumed...
+            println!("{}", parsed.to_math_ml());
+            assert_eq!(unparsed.len(), 0);
+            // assert_eq!("<mrow><mo>[</mo><mrow><mo>(</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>6</mn><mo>)</mo></mrow><mo>,</mo><mrow><mo>(</mo><mn>3</mn><mo>,</mo><mn>3</mn><mo>)</mo></mrow><mo>]</mo></mrow>", parsed.to_math_ml());
+        } else {
+            assert!(false);
+        }
+    }
 }
